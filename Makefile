@@ -7,7 +7,7 @@ run:
 build_and_run: build run
 
 test: build
-	docker run -it glancemetrics pytest
+	docker run -it glancemetrics pytest -s
 
 format:
 	black .
