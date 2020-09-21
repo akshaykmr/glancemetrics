@@ -35,3 +35,8 @@ class LogRecord:
             identity=None if identity == "-" else identity,
             user_id=None if user_id == "-" else user_id,
         )
+
+    @property
+    def section(self) -> str:
+        bread_crumbs = [c for c in self.path.split("/") if c]
+        return bread_crumbs[0] if bread_crumbs else "/"

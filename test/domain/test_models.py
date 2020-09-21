@@ -20,7 +20,6 @@ class TestLogRecordFromCLF:
     def test_log_with_tz_offset(self):
         log = '10.223.157.186 - - [15/Jul/2009:14:58:59 -0700] "GET /favicon.ico HTTP/1.1" 404 209'
         record = LogRecord.from_common_log_format(log)
-        print(record)
         assert record == LogRecord(
             ip="10.223.157.186",
             time=datetime(
@@ -39,3 +38,9 @@ class TestLogRecordFromCLF:
             identity=None,
             user_id=None,
         )
+
+
+def test_log_record_section():
+    log = '10.223.157.186 - - [15/Jul/2009:14:58:59 -0700] "GET /pages/foo HTTP/1.1" 404 209'
+    record = LogRecord.from_common_log_format(log)
+    assert record.section == "pages"
