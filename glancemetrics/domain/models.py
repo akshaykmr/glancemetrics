@@ -117,6 +117,7 @@ class LogSeries:
 
 
 def hit_rate(series: LogSeries) -> int:
+    """avg. hit rate for series"""
     if not series.buckets:
         return 0
     rate = sum([len(bucket.logs) for bucket in series.buckets]) / len(series.buckets)
@@ -156,9 +157,3 @@ class Insights:
             client_errors=len(client_errors),
             server_errors=len(server_errors),
         )
-
-
-@dataclass
-class SectionStats:
-    name: str
-    insights: Insights
