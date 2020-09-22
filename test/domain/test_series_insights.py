@@ -1,5 +1,5 @@
-from glancemetrics.domain.models import LogSeries, Insights
-from glancemetrics.domain.insights import top_sections
+from glancemetrics.domain.models import LogSeries
+from glancemetrics.domain.insights import top_sections, Insights
 from test.utils import logs_to_series
 
 
@@ -55,7 +55,7 @@ class TestInsights:
         ]
         series = logs_to_series(logs)
         first, second = top_sections(series, limit=2)
-        assert first.name == 'api'
+        assert first.name == "api"
         assert first.hits == 6
-        assert second.name == 'doge'
+        assert second.name == "doge"
         assert second.hits == 3
