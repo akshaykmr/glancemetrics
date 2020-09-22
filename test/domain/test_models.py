@@ -1,7 +1,6 @@
 from datetime import datetime, timezone, timedelta
 import pytest
 
-from glancemetrics.utils.datetime import current_time, seconds_interval
 from glancemetrics.domain.models import LogRecord, LogBucket, LogSeries
 
 from test.factories import log_record_dm
