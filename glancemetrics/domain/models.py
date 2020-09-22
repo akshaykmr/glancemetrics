@@ -88,5 +88,16 @@ class LogSeries:
             return
 
         previous_bucket = self.series[-1]
-        if log_bucket.time - previous_bucket.time != timedelta(seconds=1):
+        time_diff = log_bucket.time - previous_bucket.time
+        if time_diff <= timedelta(seconds=0):
             raise AssertionError("invalid continuation log-bucket for series")
+
+        # append empty buckets till time diff = 1 second
+        self.series += [
+            LogBucket(time=previous_bucket.time + timedelta(seconds=s))
+            for s in range(int(time_diff.total_seconds()) - 1)
+        ]
+
+        previous_bucket = self.series[-1]
+        assert log_bucket.time - previous_bucket.time == timedelta(seconds=1)
+        self.series.append(log_bucket)
