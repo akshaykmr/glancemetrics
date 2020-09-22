@@ -11,9 +11,10 @@ def parse_tz_offset(offset: str) -> tzinfo:
 
 
 def current_time() -> datetime:
-    # tz aware current time
+    """tz aware current time"""
     return datetime.now(timezone.utc)
 
 
 def seconds_interval(d: datetime) -> datetime:
+    """new dto with seconds floored, used to identify interval"""
     return d.replace(microsecond=0)
