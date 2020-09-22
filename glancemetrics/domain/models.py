@@ -3,6 +3,7 @@ from typing import Optional, List
 from datetime import datetime, timedelta
 from glancemetrics.utils.datetime import parse_tz_offset, seconds_interval
 from clfparser import CLFParser
+from itertools import chain
 
 
 @dataclass
@@ -41,6 +42,18 @@ class LogRecord:
         bread_crumbs = [c for c in self.path.split("/") if c]
         return bread_crumbs[0] if bread_crumbs else "/"
 
+    @property
+    def is_error(self) -> bool:
+        return self.is_client_error or self.is_server_error
+
+    @property
+    def is_client_error(self) -> bool:
+        return 400 <= self.status_code < 500
+
+    @property
+    def is_server_error(self) -> bool:
+        return 500 <= self.status_code < 600
+
 
 @dataclass
 class LogBucket:
@@ -66,38 +79,85 @@ class LogSeries:
     """histogram like grouping of logs with time, using 1-second intervals
     eg. 
         if start-time was 1:00:00
-        series[0] would be the logs captured in 1:00:00 - 1:00:01 interval
-        series[1] would be the logs captured in 1:00:01 - 1:00:02 interval
+        buckets[0] would be the logs captured in 1:00:00 - 1:00:01 interval
+        buckets[1] would be the logs captured in 1:00:01 - 1:00:02 interval
     """
 
-    series: List[LogBucket] = field(default_factory=list)
+    buckets: List[LogBucket] = field(default_factory=list)
 
     @property
     def start_time(self) -> Optional[datetime]:
-        if self.series:
-            return self.series[0].time
+        if self.buckets:
+            return self.buckets[0].time
 
     @property
     def end_time(self) -> Optional[datetime]:
-        if self.series:
-            return self.series[-1].time
+        if self.buckets:
+            return self.buckets[-1].time
 
     def append(self, log_bucket: LogBucket):
         if not self.start_time:
-            self.series.append(log_bucket)
+            self.buckets.append(log_bucket)
             return
 
-        previous_bucket = self.series[-1]
+        previous_bucket = self.buckets[-1]
         time_diff = log_bucket.time - previous_bucket.time
         if time_diff <= timedelta(seconds=0):
             raise ("invalid continuation log-bucket for series")
 
         # append empty buckets till time diff = 1 second
-        self.series += [
+        self.buckets += [
             LogBucket(time=previous_bucket.time + timedelta(seconds=s))
             for s in range(int(time_diff.total_seconds()) - 1)
         ]
 
-        previous_bucket = self.series[-1]
+        previous_bucket = self.buckets[-1]
         assert log_bucket.time - previous_bucket.time == timedelta(seconds=1)
-        self.series.append(log_bucket)
+        self.buckets.append(log_bucket)
+
+
+def hit_rate(series: LogSeries) -> int:
+    if not series.buckets:
+        return 0
+    return sum([len(bucket.logs) for bucket in series.buckets]) / len(series.buckets)
+
+
+@dataclass
+class Insights:
+    hits: int
+    bytes_transferred: int
+    known_users: int
+    hit_rate: int
+    error_count: int
+    client_errors: int
+    server_errors: int
+
+    @property
+    def error_percentage(self):
+        if not self.hits:
+            return 0
+        return (self.error_count / self.hits) * 100
+
+    @classmethod
+    def from_log_series(cls, series: LogSeries) -> "Insights":
+        all_logs: List[LogRecord] = chain.from_iterable(
+            [bucket.logs for bucket in series.buckets]
+        )
+        error_logs = [log for log in all_logs if log.is_error]
+        client_errors = [log for log in error_logs if log.is_client_error]
+        server_errors = [log for log in error_logs if log.is_server_error]
+        return cls(
+            hits=len(all_logs),
+            bytes_transferred=sum([log.content_size for log in all_logs]),
+            known_users=len({log.user_id for log in all_logs if log.user_id}),
+            hit_rate=hit_rate(series),
+            error_count=len(error_logs),
+            client_errors=len(client_errors),
+            server_errors=len(server_errors),
+        )
+
+
+@dataclass
+class SectionStats:
+    name: str
+    insights: Insights
