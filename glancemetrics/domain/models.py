@@ -119,7 +119,8 @@ class LogSeries:
 def hit_rate(series: LogSeries) -> int:
     if not series.buckets:
         return 0
-    return sum([len(bucket.logs) for bucket in series.buckets]) / len(series.buckets)
+    rate = sum([len(bucket.logs) for bucket in series.buckets]) / len(series.buckets)
+    return round(rate, 1)
 
 
 @dataclass
@@ -140,8 +141,8 @@ class Insights:
 
     @classmethod
     def from_log_series(cls, series: LogSeries) -> "Insights":
-        all_logs: List[LogRecord] = chain.from_iterable(
-            [bucket.logs for bucket in series.buckets]
+        all_logs: List[LogRecord] = list(
+            chain.from_iterable([bucket.logs for bucket in series.buckets])
         )
         error_logs = [log for log in all_logs if log.is_error]
         client_errors = [log for log in error_logs if log.is_client_error]
