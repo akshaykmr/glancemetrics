@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, List
 from datetime import datetime, timedelta
-from glancemetrics.utils.datetime import parse_tz_offset
+from glancemetrics.utils.datetime import parse_tz_offset, seconds_interval
 from clfparser import CLFParser
 
 
@@ -44,7 +44,7 @@ class LogRecord:
 
 @dataclass
 class LogBucket:
-    """logs captured in a second interval."""
+    """logs captured in a 1-second interval."""
 
     time: datetime  # time + 1 second interval
     logs: List[LogRecord] = field(default_factory=list)
@@ -55,7 +55,7 @@ class LogBucket:
 
     def add(self, log: LogRecord):
         # floors microsecond, note: replace returns new datetime, doesn't modify original
-        log_interval = log.time.replace(microsecond=0)
+        log_interval = seconds_interval(log.time)
         if log_interval != self.time:
             raise AssertionError("adding log in inappropriate bucket")
         self.logs.append(log)
@@ -63,7 +63,7 @@ class LogBucket:
 
 @dataclass
 class LogSeries:
-    """histogram like grouping of logs with time, using second intervals
+    """histogram like grouping of logs with time, using 1-second intervals
     eg. 
         if start-time was 1:00:00
         series[0] would be the logs captured in 1:00:00 - 1:00:01 interval
@@ -90,7 +90,7 @@ class LogSeries:
         previous_bucket = self.series[-1]
         time_diff = log_bucket.time - previous_bucket.time
         if time_diff <= timedelta(seconds=0):
-            raise AssertionError("invalid continuation log-bucket for series")
+            raise ("invalid continuation log-bucket for series")
 
         # append empty buckets till time diff = 1 second
         self.series += [
