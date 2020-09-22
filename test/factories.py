@@ -1,7 +1,8 @@
 from random import choice, randint
 from datetime import timedelta
+from typing import List
 
-from glancemetrics.domain.models import LogRecord, LogBucket
+from glancemetrics.domain.models import LogRecord
 from glancemetrics.utils.datetime import current_time
 
 
@@ -55,3 +56,21 @@ def log_record_dm(
         identity=identity,
         user_id=user_id,
     )
+
+
+class FakeFile:
+    """fake file interface that implements basic readline and append"""
+
+    def __init__(self, lines: List[str]):
+        self.lines = lines
+        self.read_lines = 0
+
+    def readline(self):
+        if self.read_lines == len(self.lines):
+            return None
+        line = self.lines[self.read_lines]
+        self.read_lines += 1
+        return line
+
+    def append(self, log: str):
+        self.lines.append(log)
