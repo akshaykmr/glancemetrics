@@ -1,5 +1,10 @@
-from glancemetrics.domain.models import LogRecord
 from datetime import datetime, timezone, timedelta
+import pytest
+
+from glancemetrics.utils.datetime import current_time, seconds_interval
+from glancemetrics.domain.models import LogRecord, LogBucket, LogSeries
+
+from test.factories import log_record_dm
 
 
 class TestLogRecordFromCLF:
@@ -44,3 +49,15 @@ def test_log_record_section():
     log = '10.223.157.186 - - [15/Jul/2009:14:58:59 -0700] "GET /pages/foo HTTP/1.1" 404 209'
     record = LogRecord.from_common_log_format(log)
     assert record.section == "pages"
+
+
+def test_log_bucket_throws_error_if_adding_log_from_another_interval():
+    bucket = LogBucket(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+
+    bucket.add(log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc)))
+
+    with pytest.raises(AssertionError):
+        # next second
+        bucket.add(
+            log_record_dm(time=datetime(2018, 5, 9, 16, 0, 40, tzinfo=timezone.utc))
+        )

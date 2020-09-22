@@ -29,8 +29,8 @@ class LogRecord:
         return cls(
             ip=log_dict["h"],
             time=time.replace(tzinfo=tz),
-            method=method,
-            path=path,
+            method=method.upper(),
+            path=path.lower(),
             status_code=int(log_dict["s"]),
             content_size=int(log_dict["b"]),
             identity=None if identity == "-" else identity,
