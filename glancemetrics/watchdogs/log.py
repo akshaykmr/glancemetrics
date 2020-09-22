@@ -1,11 +1,17 @@
 from pathlib import Path
 from time import sleep
+from datetime import timedelta
+
 from glancemetrics.utils.datetime import current_time, seconds_interval
 from glancemetrics.domain.models import LogRecord, LogBucket
 
 
 def _needs_new_bucket(log: LogRecord, current_bucket: LogBucket) -> bool:
     return seconds_interval(log.time) != current_bucket.time
+
+
+def _bucket_complete(bucket: LogBucket) -> bool:
+    return current_time() - bucket.time > timedelta(seconds=1)
 
 
 def _validate_file_path(filepath: str) -> Path:
@@ -21,8 +27,15 @@ def logwatcher(log_file):
         line = log_file.readline()
         if not line:
             # no new logs
-            yield None
-            sleep(0.2)
+            if current_bucket and _bucket_complete(current_bucket):
+                yield current_bucket
+                current_bucket = None
+                continue
+            else:
+                yield None
+                sleep(0.2)
+                continue
+
         log = LogRecord.from_common_log_format(line)
         assert log.time <= current_time()
 
@@ -42,7 +55,7 @@ if __name__ == "__main__":
     path = _validate_file_path(file_path)
     with open(str(path), "r") as log_file:
         watcher = logwatcher(log_file)
-        limit = 10
+        limit = 5
         count = 0
         for bucket in watcher:
             if count > limit:
