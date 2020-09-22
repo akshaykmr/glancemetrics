@@ -95,7 +95,7 @@ class LogSeries:
         if self.buckets:
             return self.buckets[-1].time
 
-    def append(self, log_bucket: LogBucket):
+    def append(self, log_bucket: LogBucket) -> "LogBucket":
         if not self.start_time:
             self.buckets.append(log_bucket)
             return
@@ -103,11 +103,11 @@ class LogSeries:
         previous_bucket = self.buckets[-1]
         time_diff = log_bucket.time - previous_bucket.time
         if time_diff <= timedelta(seconds=0):
-            raise ("invalid continuation log-bucket for series")
+            raise Exception("invalid continuation log-bucket for series")
 
-        # append empty buckets till time diff = 1 second
+        # pad empty buckets till time diff = 1 second
         self.buckets += [
-            LogBucket(time=previous_bucket.time + timedelta(seconds=s))
+            LogBucket(time=previous_bucket.time + timedelta(seconds=s + 1))
             for s in range(int(time_diff.total_seconds()) - 1)
         ]
 
