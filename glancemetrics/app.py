@@ -1,5 +1,7 @@
 from typing import List
 
+# metrics app outline
+
 
 class GlanceMetrics:
     def __init__(self, alerts=None, insights_interval=None):
@@ -11,7 +13,7 @@ class GlanceMetrics:
 
     def refresh(self):
         """update self with latest metrics from logs"""
-        # read log-buckets till None or 1 second (logs may keep on coming)
+        # read log-buckets till None or till time at refresh (logs may keep on coming)
         # pass bucket to any observer - insights, alerts
         raise NotImplementedError
 
