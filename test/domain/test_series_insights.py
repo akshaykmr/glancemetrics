@@ -9,6 +9,7 @@ class TestInsights:
         assert Insights.from_log_series(series) == Insights(
             hits=0,
             bytes_transferred=0,
+            transfer_rate=0,
             known_users=0,
             hit_rate=0,
             error_count=0,
@@ -34,6 +35,7 @@ class TestInsights:
             hits=10,
             bytes_transferred=2103,
             known_users=2,
+            transfer_rate=32.9,
             hit_rate=0.2,
             error_count=4,
             client_errors=1,

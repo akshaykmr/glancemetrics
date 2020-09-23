@@ -5,8 +5,8 @@ from glancemetrics.utils import group_by
 from itertools import chain
 
 
-def hit_rate(series: LogSeries) -> int:
-    """avg. hit rate for series"""
+def _hit_rate(series: LogSeries) -> int:
+    """avg. hit rate for series  reqs/s"""
     if not series.buckets:
         return 0
     rate = sum([len(bucket.logs) for bucket in series.buckets]) / len(series.buckets)
@@ -20,7 +20,8 @@ class Insights:
     hits: int
     bytes_transferred: int
     known_users: int
-    hit_rate: int
+    hit_rate: int  # avg. req/s
+    transfer_rate: int  # avg. bytes/s
     error_count: int
     client_errors: int
     server_errors: int
@@ -39,11 +40,15 @@ class Insights:
         error_logs = [log for log in all_logs if log.is_error]
         client_errors = [log for log in error_logs if log.is_client_error]
         server_errors = [log for log in error_logs if log.is_server_error]
+        total_bytes = sum([log.content_size for log in all_logs])
         return cls(
             hits=len(all_logs),
-            bytes_transferred=sum([log.content_size for log in all_logs]),
+            bytes_transferred=total_bytes,
+            transfer_rate=round(total_bytes / len(series.buckets), 1)
+            if series.buckets
+            else 0,
             known_users=len({log.user_id for log in all_logs if log.user_id}),
-            hit_rate=hit_rate(series),
+            hit_rate=_hit_rate(series),
             error_count=len(error_logs),
             client_errors=len(client_errors),
             server_errors=len(server_errors),
@@ -62,7 +67,7 @@ class SectionLogs:
         return len(self.logs)
 
 
-def group_by_section(series: LogSeries) -> List[SectionLogs]:
+def _group_by_section(series: LogSeries) -> List[SectionLogs]:
     all_logs: List[LogRecord] = list(
         chain.from_iterable([bucket.logs for bucket in series.buckets])
     )
@@ -72,7 +77,7 @@ def group_by_section(series: LogSeries) -> List[SectionLogs]:
     ]
 
 
-def sorted_sections(section_logs: List[SectionLogs]) -> List[SectionLogs]:
+def _sorted_sections(section_logs: List[SectionLogs]) -> List[SectionLogs]:
     """sort by number of hits"""
     return sorted(
         section_logs, key=lambda section_insights: section_insights.hits, reverse=True
@@ -81,5 +86,5 @@ def sorted_sections(section_logs: List[SectionLogs]) -> List[SectionLogs]:
 
 def top_sections(series: LogSeries, limit: int = 10) -> List[SectionLogs]:
     """top hits sections"""
-    section_logs = group_by_section(series)
-    return sorted_sections(section_logs)[:limit]
+    section_logs = _group_by_section(series)
+    return _sorted_sections(section_logs)[:limit]
