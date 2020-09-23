@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from itertools import dropwhile
 from typing import Optional, List
 from datetime import datetime, timedelta
 from glancemetrics.utils.datetime import parse_tz_offset, seconds_interval
@@ -126,4 +127,4 @@ class LogSeries:
         a consumer may use trim to let old logs that are not needed to get garbage collected
         """
         # series is already sorted
-        self.buckets = [b for b in self.buckets if b.time >= from_time]
+        self.buckets = list(dropwhile(lambda b: b.time < from_time, self.buckets))

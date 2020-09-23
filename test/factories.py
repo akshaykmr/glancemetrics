@@ -95,5 +95,6 @@ class FakeFile:
         self.read_lines += 1
         return line
 
+    # only for test purposes
     def append(self, log: str):
         self.lines.append(log)
