@@ -1,5 +1,5 @@
 from random import choice, randint
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import List
 
 from glancemetrics.domain.models import LogRecord
@@ -36,6 +36,14 @@ def random_path():
     return choice(paths)
 
 
+def random_time():
+    return current_time() - timedelta(seconds=randint(0, 100))
+
+
+def random_status():
+    return randint(100, 600)
+
+
 def log_record_dm(
     ip=None,
     time=None,
@@ -48,21 +56,36 @@ def log_record_dm(
 ) -> LogRecord:
     return LogRecord(
         ip=ip or random_ip(),
-        time=time or current_time() - timedelta(seconds=randint(0, 100)),
+        time=time or random_time(),
         method=method or random_method(),
         path=path or random_path(),
-        status_code=status_code or randint(100, 600),
+        status_code=status_code or random_status(),
         content_size=randint(500, 1500) if content_size is None else content_size,
         identity=identity,
         user_id=user_id,
     )
 
 
+def fake_log_str(
+    ip=None,
+    time=None,
+    method=None,
+    path=None,
+    status_code=None,
+    content_size=None,
+    identity=None,
+    user_id=None,
+):
+    time_tag = datetime.strftime(time or random_time(), "[%d/%b/%Y:%H:%M:%S %z]")
+    content_size = randint(500, 1500) if content_size is None else content_size
+    return f"""{ip or random_ip()} {identity or '-'} {user_id or '-'} {time_tag} "{method or random_method()} {path or random_path()} HTTP/1.1" {status_code or random_status()} {content_size}"""
+
+
 class FakeFile:
     """fake file interface that implements basic readline and append"""
 
     def __init__(self, lines: List[str]):
-        self.lines = lines
+        self.lines = lines or []
         self.read_lines = 0
 
     def readline(self):

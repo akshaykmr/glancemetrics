@@ -1,8 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from glancemetrics.watchdogs.log import logwatcher
 from glancemetrics.domain.models import LogBucket, LogRecord
+from glancemetrics.utils.datetime import current_time
 
-from test.factories import FakeFile
+from test.factories import FakeFile, fake_log_str
 
 
 def test_it_yields_log_buckets_correctly():
@@ -106,4 +107,10 @@ def test_it_yields_log_buckets_correctly():
             )
         ],
     )
+    assert next(watcher) is None
+
+    # append a log to greater than current time
+    # to test it waits for the bucket to complete before yielding it
+    log = fake_log_str(time=current_time() + timedelta(seconds=1))
+    fake_file.append(log)
     assert next(watcher) is None

@@ -25,16 +25,13 @@ class InsightsSummary:
         if bucket.time < self._limit:
             return
         self._trim_series()
-        self.series.append(bucket)
+        self._series.append(bucket)
 
-    @property
-    def insights(
-        self, top_section_limit: int = 10
-    ) -> Tuple[Insights, List[SectionLogs]]:
+    def get_insights(self, top_sections_limit) -> Tuple[Insights, List[SectionLogs]]:
         self._trim_series()
         return (
             Insights.from_log_series(self._series),
-            top_sections(self._series, limit=top_section_limit),
+            top_sections(self._series, limit=top_sections_limit),
         )
 
     def _trim_series(self):

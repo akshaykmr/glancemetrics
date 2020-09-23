@@ -22,7 +22,9 @@ def _validate_file_path(filepath: str) -> Path:
 
 
 def logwatcher(log_file) -> Iterator[Optional[LogBucket]]:
-    """yields bucket of logs (groups of 1-second interval)"""
+    """
+    yields bucket of logs (groups of 1-second interval)
+    """
     current_bucket = None
     while True:
         line = log_file.readline()
@@ -38,7 +40,6 @@ def logwatcher(log_file) -> Iterator[Optional[LogBucket]]:
                 continue
 
         log = LogRecord.from_common_log_format(line)
-        assert log.time <= current_time()
 
         if current_bucket and _needs_new_bucket(log, current_bucket):
             yield current_bucket
