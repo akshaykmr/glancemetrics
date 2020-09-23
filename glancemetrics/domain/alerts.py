@@ -3,12 +3,21 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 from glancemetrics.domain.models import LogSeries, LogBucket
+from glancemetrics.domain.insights import hit_rate, total_hits
 from glancemetrics.utils.datetime import current_time
+
+
+# TODO: can use interfaces/ABC for different types of alerts
+# i.e. not just high-traffic alerts
 
 
 @dataclass
 class Incident:
-    hits: int
+    # hit-rate when breach occurred
+    breach_hitrate: int
+
+    # max-rate during incident interval
+    max_hitrate: int
     triggered_at: datetime
     recovered_at: Optional[datetime] = None
 
@@ -24,18 +33,19 @@ class Incident:
 
 class Alert:
     """
-    monitors high traffic scenario for a a time interval
+    monitors high traffic scenario for a time interval
     say, past 2 minutes
-
-    # TODO: this class can be abstracted for different types of alerts
-    # i.e. not just high-traffic alerts
     """
 
-    def __init__(self, window: timedelta):
+    def __init__(self, threshold: int, window: timedelta):
+        self.threshold = threshold  # in req/s
+
         if window < timedelta(seconds=1):
             raise ValueError("interval must be atleast 1 second")
-
         self._window = window
+
+        # TODO: can use a metric-series, to just keep series of hit-rate instead
+        # this can improve memory usage for very high log throughput.
         self._series: LogSeries = LogSeries()
 
         self.incidents: List[Incident] = []
@@ -45,7 +55,27 @@ class Alert:
             return
         self._trim_series()
         self._series.append(bucket)
-        # TODO: trigger / recover alert
+        self.refresh()
+
+    def refresh(self):
+        self._trim_series()
+        hits = hit_rate(total_hits(self._series), self._window)
+        active_incident = self.active_incident
+        if hits < self.threshold:
+            if active_incident:
+                active_incident.recovered_at = current_time()
+            return
+
+        # ongoing incident
+        if active_incident is not None:
+            active_incident.max_hitrate = max(active_incident.max_hitrate, hits)
+            return
+
+        # new incident
+        incident = Incident(
+            breach_hitrate=hits, max_hitrate=hits, triggered_at=current_time(),
+        )
+        self.incidents.append(incident)
 
     @property
     def is_blaring(self) -> bool:
