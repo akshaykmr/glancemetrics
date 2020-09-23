@@ -106,3 +106,4 @@ def test_it_yields_log_buckets_correctly():
             )
         ],
     )
+    assert next(watcher) is None
