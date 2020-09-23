@@ -1,16 +1,21 @@
 from typing import List
 from dataclasses import dataclass
+from datetime import timedelta
 from glancemetrics.domain.models import LogSeries, LogRecord
 from glancemetrics.utils import group_by
 from itertools import chain
 
 
-def _hit_rate(series: LogSeries) -> int:
-    """avg. hit rate for series  reqs/s"""
-    if not series.buckets:
-        return 0
-    rate = sum([len(bucket.logs) for bucket in series.buckets]) / len(series.buckets)
-    return round(rate, 1)
+def hit_rate(hits: int, window: timedelta) -> float:
+    """avg. hit rate in reqs/s"""
+    seconds = int(window.total_seconds())
+    if seconds < 1:
+        raise ValueError("invalid window size")
+    return round(hits / seconds, 1)
+
+
+def total_hits(series: LogSeries) -> int:
+    return sum([len(bucket.logs) for bucket in series.buckets])
 
 
 @dataclass
@@ -20,8 +25,6 @@ class Insights:
     hits: int
     bytes_transferred: int
     known_users: int
-    hit_rate: int  # avg. req/s
-    transfer_rate: int  # avg. bytes/s
     error_count: int
     client_errors: int
     server_errors: int
@@ -44,11 +47,7 @@ class Insights:
         return cls(
             hits=len(all_logs),
             bytes_transferred=total_bytes,
-            transfer_rate=round(total_bytes / len(series.buckets), 1)
-            if series.buckets
-            else 0,
             known_users=len({log.user_id for log in all_logs if log.user_id}),
-            hit_rate=_hit_rate(series),
             error_count=len(error_logs),
             client_errors=len(client_errors),
             server_errors=len(server_errors),
