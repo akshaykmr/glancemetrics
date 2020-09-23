@@ -113,3 +113,11 @@ class LogSeries:
         previous_bucket = self.buckets[-1]
         assert log_bucket.time - previous_bucket.time == timedelta(seconds=1)
         self.buckets.append(log_bucket)
+
+    def trim(self, from_time: datetime):
+        """
+        trims series buckets where time > from time
+        a consumer may use trim to let old logs that are not needed to get garbage collected
+        """
+        # series is already sorted
+        self.buckets = [b for b in self.buckets if b.time >= from_time]

@@ -61,43 +61,72 @@ def test_log_bucket_throws_error_if_adding_log_from_another_interval():
         )
 
 
-def test_log_series_append_bucket_works_for_future_intervals_by_padding():
-    series = LogSeries()
+class TestLogSeries:
+    def test_log_series_append_bucket_works_for_future_intervals_by_padding(self):
+        series = LogSeries()
 
-    bucket_1 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
-    bucket_1.add(
-        log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
-    )
-    bucket_1.add(
-        log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
-    )
+        bucket_1 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        bucket_1.add(
+            log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        )
+        bucket_1.add(
+            log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        )
 
-    bucket_2 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 40, tzinfo=timezone.utc))
-    bucket_3 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 43, tzinfo=timezone.utc))
+        bucket_2 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 40, tzinfo=timezone.utc))
+        bucket_3 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 43, tzinfo=timezone.utc))
 
-    series.append(bucket_1)
-    series.append(bucket_2)
-    series.append(bucket_3)
-
-    assert series.buckets == [
-        bucket_1,
-        bucket_2,
-        LogBucket(time=datetime(2018, 5, 9, 16, 0, 41, tzinfo=timezone.utc)),
-        LogBucket(time=datetime(2018, 5, 9, 16, 0, 42, tzinfo=timezone.utc)),
-        bucket_3,
-    ]
-
-
-def test_appending_past_bucket_to_series_raises_exception():
-    series = LogSeries()
-
-    bucket_1 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
-    bucket_1.add(
-        log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
-    )
-
-    bucket_2 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 38, tzinfo=timezone.utc))
-
-    series.append(bucket_1)
-    with pytest.raises(Exception):
+        series.append(bucket_1)
         series.append(bucket_2)
+        series.append(bucket_3)
+
+        assert series.buckets == [
+            bucket_1,
+            bucket_2,
+            LogBucket(time=datetime(2018, 5, 9, 16, 0, 41, tzinfo=timezone.utc)),
+            LogBucket(time=datetime(2018, 5, 9, 16, 0, 42, tzinfo=timezone.utc)),
+            bucket_3,
+        ]
+
+    def test_appending_past_bucket_to_series_raises_exception(self):
+        series = LogSeries()
+
+        bucket_1 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        bucket_1.add(
+            log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        )
+
+        bucket_2 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 38, tzinfo=timezone.utc))
+
+        series.append(bucket_1)
+        with pytest.raises(Exception):
+            series.append(bucket_2)
+
+    def test_trimming_series(self):
+        series = LogSeries()
+
+        bucket_1 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        bucket_1.add(
+            log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        )
+        bucket_1.add(
+            log_record_dm(time=datetime(2018, 5, 9, 16, 0, 39, tzinfo=timezone.utc))
+        )
+
+        bucket_2 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 40, tzinfo=timezone.utc))
+        bucket_3 = LogBucket(time=datetime(2018, 5, 9, 16, 0, 43, tzinfo=timezone.utc))
+
+        series.append(bucket_1)
+        series.append(bucket_2)
+        series.append(bucket_3)
+
+        series.trim(from_time=datetime(2018, 5, 9, 16, 0, 41, tzinfo=timezone.utc))
+
+        assert series.buckets == [
+            LogBucket(time=datetime(2018, 5, 9, 16, 0, 41, tzinfo=timezone.utc)),
+            LogBucket(time=datetime(2018, 5, 9, 16, 0, 42, tzinfo=timezone.utc)),
+            bucket_3,
+        ]
+
+        series.trim(from_time=datetime(2018, 5, 9, 16, 0, 45, tzinfo=timezone.utc))
+        assert series.buckets == []
