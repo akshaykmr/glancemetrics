@@ -98,3 +98,7 @@ class FakeFile:
     # only for test purposes
     def append(self, log: str):
         self.lines.append(log)
+
+    # only for test purposes
+    def append_logs(self, logs: List[str]):
+        self.lines += logs
