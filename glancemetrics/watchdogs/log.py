@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Iterator, Optional
 from time import sleep
 from datetime import timedelta
 
@@ -21,7 +21,7 @@ def _validate_file_path(filepath: str) -> Path:
     return path
 
 
-def logwatcher(log_file) -> Generator[Optional[LogBucket], None, None]:
+def logwatcher(log_file) -> Iterator[Optional[LogBucket]]:
     """yields bucket of logs (groups of 1-second interval)"""
     current_bucket = None
     while True:
