@@ -17,10 +17,6 @@ class InsightsSummary:
         self._window = window
         self._series: LogSeries = LogSeries()
 
-    @property
-    def _limit(self) -> datetime:
-        return current_time() - self._window
-
     def ingest(self, bucket: LogBucket):
         if bucket.time < self._limit:
             return
@@ -33,6 +29,10 @@ class InsightsSummary:
             Insights.from_log_series(self._series),
             top_sections(self._series, limit=top_sections_limit),
         )
+
+    @property
+    def _limit(self) -> datetime:
+        return current_time() - self._window
 
     def _trim_series(self):
         self._series.trim(from_time=self._limit)
