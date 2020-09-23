@@ -31,5 +31,5 @@ def test_refreshing_ingests_all_logs_till_none():
     insights, top_sections = glance.insights(top_sections_limit=1)
     assert insights.bytes_transferred == 362
     top_section = top_sections[0]
-    assert top_section.name == "doggo"
+    assert top_section.name == "/doggo"
     assert top_section.hits == 2

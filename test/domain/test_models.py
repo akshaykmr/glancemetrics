@@ -47,7 +47,7 @@ class TestLogRecordFromCLF:
 def test_log_record_section():
     log = '10.223.157.186 - - [15/Jul/2009:14:58:59 -0700] "GET /pages/foo HTTP/1.1" 404 209'
     record = LogRecord.from_common_log_format(log)
-    assert record.section == "pages"
+    assert record.section == "/pages"
 
 
 def test_log_bucket_throws_error_if_adding_log_from_another_interval():

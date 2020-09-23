@@ -39,7 +39,7 @@ class LogRecord:
     @property
     def section(self) -> str:
         bread_crumbs = [c for c in self.path.split("/") if c]
-        return bread_crumbs[0] if bread_crumbs else "/"
+        return f"/{bread_crumbs[0]}" if bread_crumbs else "/"
 
     @property
     def is_error(self) -> bool:

@@ -63,9 +63,9 @@ class TestInsights:
         ]
         series = logs_to_series(logs)
         first, second = top_sections(series, limit=2)
-        assert first.name == "api"
+        assert first.name == "/api"
         assert first.hits == 6
-        assert second.name == "doge"
+        assert second.name == "/doge"
         assert second.hits == 3
 
 
