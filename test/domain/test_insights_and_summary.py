@@ -1,6 +1,12 @@
-from glancemetrics.domain.models import LogSeries
+from datetime import timedelta
+from glancemetrics.domain.models import LogSeries, LogBucket
 from glancemetrics.domain.insights import top_sections, Insights
+from glancemetrics.domain.summary import InsightsSummary
+
 from test.utils import logs_to_series
+
+from glancemetrics.utils.datetime import current_time
+from test.factories import log_record_dm
 
 
 class TestInsights:
@@ -61,3 +67,36 @@ class TestInsights:
         assert first.hits == 6
         assert second.name == "doge"
         assert second.hits == 3
+
+
+class TestInsightsSummary:
+    def test_summary_when_no_series_and_ingestion(self):
+        watcher = InsightsSummary(window=timedelta(seconds=5))
+        assert Insights(
+            hits=0,
+            bytes_transferred=0,
+            known_users=0,
+            hit_rate=0,
+            transfer_rate=0,
+            error_count=0,
+            client_errors=0,
+            server_errors=0,
+        ), ([] == watcher.insights)
+
+    def test_it_ignores_logs_outside_of_window(self):
+        watcher = InsightsSummary(window=timedelta(seconds=5))
+
+        now = current_time()
+        old_log = log_record_dm(time=now - timedelta(seconds=10))
+        bucket = LogBucket.from_initial_log(old_log)
+        watcher.ingest(bucket)
+        assert Insights(
+            hits=0,
+            bytes_transferred=0,
+            known_users=0,
+            hit_rate=0,
+            transfer_rate=0,
+            error_count=0,
+            client_errors=0,
+            server_errors=0,
+        ), ([] == watcher.insights)

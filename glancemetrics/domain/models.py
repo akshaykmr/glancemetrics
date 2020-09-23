@@ -72,6 +72,12 @@ class LogBucket:
             raise AssertionError("adding log in inappropriate bucket")
         self.logs.append(log)
 
+    @classmethod
+    def from_initial_log(cls, log: LogRecord) -> "LogBucket":
+        bucket = cls(time=seconds_interval(log.time))
+        bucket.add(log)
+        return bucket
+
 
 @dataclass
 class LogSeries:
