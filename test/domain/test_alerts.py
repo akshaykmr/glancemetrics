@@ -62,7 +62,9 @@ def test_high_traffic_alerting(time_now_fn):
     assert alert.is_blaring
 
     incident = alert.active_incident
-    assert incident.breach_hitrate == round((12 + 9) / 5, 1)
+    assert incident.breach_hitrate == round(
+        (12 + 9) / 5, 1
+    )  # 9 + 12 hits divided by time window size
     assert incident.triggered_at == now
 
     # lets advance the time by 2 seconds, with no new logs
