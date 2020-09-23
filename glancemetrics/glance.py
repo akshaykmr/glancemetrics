@@ -1,9 +1,10 @@
 from datetime import timedelta
-from typing import List, Iterator, Optional, Tuple, Any
+from typing import List, Iterator, Optional, Tuple
 
 from glancemetrics.domain.models import LogBucket
 from glancemetrics.domain.insights import Insights, SectionLogs
 from glancemetrics.domain.summary import InsightsSummary
+from glancemetrics.domain.alerts import Alert
 
 from glancemetrics.utils.datetime import current_time
 
@@ -13,16 +14,18 @@ class GlanceMetrics:
         self,
         log_stream: Iterator[Optional[LogBucket]],
         insights_window: timedelta = timedelta(seconds=10),
-        alerts: List[Any] = None,  # TODO
+        alerts=None,
     ):
+        self.alerts: List[Alert] = alerts or []
+
         self._log_stream = log_stream
-        self._alerts = alerts or []
         self._insights_view = InsightsSummary(window=insights_window)
 
         # holds any callables interested in stream of logs. eg: insights, alerts!
-        self._log_ingestors = [self._insights_view.ingest]
-
-        # TODO: alterting
+        self._log_ingestors = [
+            self._insights_view.ingest,
+            *[alert.ingest for alert in self.alerts],
+        ]
 
     def refresh(self):
         """update self with latest metrics from logs"""
