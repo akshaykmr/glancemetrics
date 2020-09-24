@@ -1,5 +1,5 @@
 #!/usr/bin/env/python
-
+import os
 from pathlib import Path
 from time import sleep
 from datetime import timedelta
@@ -8,6 +8,7 @@ from glancemetrics.argsparser import parser
 from glancemetrics.watchdogs.log import logwatcher
 from glancemetrics.domain.alerts import Alert
 from glancemetrics.glance import GlanceMetrics
+from glancemetrics.utils import clear_terminal
 
 
 def _validate_file_path(filepath: str) -> Path:
@@ -42,6 +43,7 @@ with open(str(file_path), "r") as log_file:
     try:
         while True:
             glance_app.refresh()
+            clear_terminal()
             print(glance_app.insights(), flush=True)
             sleep(ui_refresh_rate)
     except KeyboardInterrupt:
