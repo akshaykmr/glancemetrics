@@ -42,7 +42,7 @@ class Alert:
 
         if window < timedelta(seconds=1):
             raise ValueError("interval must be atleast 1 second")
-        self._window = window
+        self.window = window
 
         # TODO: can use a metric-series, to just keep series of hit-rate instead
         # this can improve memory usage for very high log throughput.
@@ -59,7 +59,7 @@ class Alert:
 
     def refresh(self):
         self._trim_series()
-        hits = hit_rate(total_hits(self._series), self._window)
+        hits = hit_rate(total_hits(self._series), self.window)
         active_incident = self.active_incident
         if hits < self.threshold:
             if active_incident:
@@ -93,7 +93,7 @@ class Alert:
 
     @property
     def _limit(self) -> datetime:
-        return current_time() - self._window
+        return current_time() - self.window
 
     def _trim_series(self):
         self._series.trim(from_time=self._limit)

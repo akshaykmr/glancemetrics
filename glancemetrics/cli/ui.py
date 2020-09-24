@@ -81,6 +81,11 @@ def humanize_time(d: datetime) -> str:
 
 def print_alert_incidents(alert: Alert, limit: int) -> Table:
     "only high traffic alert supported for now"
+
+    alert_window = humanize.precisedelta(alert.window)
+    console.print(
+        f"[bold]config:[/bold] triggered if req/s > {alert.threshold} for {alert_window} on avg.\n"
+    )
     if not alert.incidents:
         console.print("[green] All good, no incidents! [/green]")
         return
@@ -93,11 +98,17 @@ def print_alert_incidents(alert: Alert, limit: int) -> Table:
 
         if incident.active:
             console.print(
-                f"[bold bright_red] 🚨 Ongoing (since {duration}): [/bold bright_red]",
+                f"[bold bright_red] 🚨 Ongoing (since {duration}):[/bold bright_red]",
                 end=" ",
             )
         else:
-            console.print(f"[bold]Recovered (duration {duration}): [/bold] ", end=" ")
+            console.print(f"[bold]Recovered (duration {duration}):[/bold]", end=" ")
         console.print(
-            f"High traffic generated an alert - hits = {breach_rate}, triggered at {humanize_time(incident.triggered_at)}, max hitrate = {max_rate}\n"
+            f"High traffic generated an alert - hits = {breach_rate}, triggered at {humanize_time(incident.triggered_at)}, max hitrate = {max_rate}",
+            end="",
         )
+        if not incident.active:
+            console.print(
+                f", recovered at {humanize_time(incident.recovered_at)}", end=""
+            )
+        console.print("\n")
