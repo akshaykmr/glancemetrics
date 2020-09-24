@@ -41,7 +41,24 @@ def random_time():
 
 
 def random_status():
-    return randint(100, 600)
+    status = [
+        200,
+        201,
+        202,
+        400,
+        404,
+        500,
+        501,
+        503,
+        301,
+        303,
+        300,
+        100,
+        101,
+        406,
+        418,  # teapot is very important
+    ]
+    return choice(status)
 
 
 def log_record_dm(
