@@ -27,8 +27,8 @@ class Incident:
 
     @property
     def duration(self) -> timedelta:
-        till = self.recovered_at if self.active else current_time()
-        return till - self.recovered_at
+        till = current_time() if self.active else self.recovered_at
+        return till - self.triggered_at
 
 
 class Alert:
