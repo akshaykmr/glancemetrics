@@ -68,7 +68,7 @@ def sections_table(top_sections: List[SectionLogs]) -> Table:
     for section in top_sections:
         row = [
             section.name,
-            section.hits,
+            humanize.intcomma(section.hits),
         ]
         table.add_row(*[str(cell) for cell in row])
     return table
