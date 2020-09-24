@@ -1,1 +1,4 @@
-print("hello new shiny app")
+from glancemetrics.argsparser import parser
+
+args = parser.parse_args()
+print(args)
