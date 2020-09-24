@@ -23,7 +23,7 @@ class Incident:
 
     @property
     def active(self) -> bool:
-        return self.recovered_at is None
+        return not self.recovered_at
 
     @property
     def duration(self) -> timedelta:
