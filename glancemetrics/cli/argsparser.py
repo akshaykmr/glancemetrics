@@ -37,6 +37,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--section_limit",
+    type=int,
+    help=f"top section limit in insights (defaults to {defaults.TOP_SECTIONS_LIMIT})",
+    default=defaults.TOP_SECTIONS_LIMIT,
+)
+
+parser.add_argument(
     "-r",
     "--refresh",
     type=int,

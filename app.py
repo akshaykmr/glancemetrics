@@ -26,10 +26,12 @@ with open(str(file_path), "r") as log_file:
     try:
         while True:
             glance_app.refresh()
-            insights, top_sections = glance_app.insights()
+            insights, top_sections = glance_app.insights(
+                top_sections_limit=args.section_limit
+            )
             render(insights, top_sections, alerts=glance_app.alerts)
             sleep(ui_refresh_rate)
     except KeyboardInterrupt:
         # could use sys.signal handler instead
         pass
-    print("exiting program")
+    print("exiting program, bye 👋")
