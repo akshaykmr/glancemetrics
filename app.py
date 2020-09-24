@@ -39,6 +39,7 @@ with open(str(file_path), "r") as log_file:
                 alerts=glance_app.alerts,
                 insights_window=insights_window,
                 program_runtime=current_time() - program_start_time,
+                section_limit=args.section_limit,
             )
             sleep(ui_refresh_rate)
     except KeyboardInterrupt:
