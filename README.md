@@ -40,15 +40,27 @@ Here's the breakdown in brief:
 
 What?? Yep, I'm going to use another project on mine to demo this project!
 It's like deploying to production -- satisfying.
-I've set-up 2 streaming terminals -- one of this application, and the other with `tail -f` of a log file. 
+I've set-up 2 streaming terminals -- one of this application, and the other with `tail -f` of the log file it's monitoring.
 
 check it out (no sign-in needed): https://teletype.oorja.io/rooms?id=bc41ea1c-bcca-482a-8c1c-14576460e429#MVcLBWDmMqZSmiWcqYyuYQ==
 
 ^^ looks better on large screens, keep scrolled to bottom.
-I'll keep this running for a week, hopefully my cheap VPS holds up well during this time.
+I'll keep this running for a week, hopefully, my cheap VPS holds up well during this time.
 
 
 ## Other thoughts, improvements
 
+- I'm pretty content with the overall design and performance of the program.
+  - [x] "something you would be proud to put your name on"
+- Speaking of performance, I tested it by generating fake logs with `make generate_logs` - req/s averaging `7000/s`. The UI was still fast enough to refresh every 2 seconds.
+- When starting afresh with large log files (109 MB) though it could take ~11 seconds for the first render (a lot of wasteful processing for logs we're not interested in). To combat this I seek to end of file at the start of the program, since we're only interested in the recent logs. Now it starts instantly. An improvement could be to seek till the first log which falls within the insights-window and then init the log-stream.
+- Improve test-coverage for `glance.py` - enforce-wiring with alerts/insights view eg. `assert alert.ingest.called_with(fake_log_buckted) on glance.refresh()`.
+- Writing the alert triggered/recovered to a file would be useful I think.
+- Lookout for log-rotation and stream the new log file (maybe monitor metadata?)
+- There's no limit to the possible new features though:
+  - plot graphs/sparkline on cli
+  - different alert-types (the app supports multiple alerts, though only one implemented)
+  - http-server with insights-api/websockets updates for a browser-app.
+- Misc: Evaluate introducing a MetricSeries data-structure (series of reduced-metrics of log-buckets). I thought of this when implementing hit-rate alert. This would increase efficiency. Though it was good enough to reuse log-series where I have all the information.
 
-<!-- 109 MB file -> 11 seconds to load if not seeking -->
+That's it, have a great day!
