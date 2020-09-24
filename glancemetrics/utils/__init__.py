@@ -18,7 +18,7 @@ If using with Docker, you need to mount the volume
 else docker would not be able to see the file.
 
 DOCKER-TIP: if your file lies in /tmp/access.log then
-easiest way is to mount the folder of log fike to /data of container like so:
+easiest way is to mount the folder of log file to /data of container like this:
 docker run -it -v /tmp:/data glancemetrics -f /data/access.log
 """
         )
