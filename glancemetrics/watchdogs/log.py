@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Iterator, Optional
 from datetime import timedelta
 
@@ -12,12 +11,6 @@ def _needs_new_bucket(log: LogRecord, current_bucket: LogBucket) -> bool:
 
 def _bucket_complete(bucket: LogBucket) -> bool:
     return current_time() - bucket.time > timedelta(seconds=1)
-
-
-def _validate_file_path(filepath: str) -> Path:
-    path = Path(filepath).resolve()
-    assert path.exists()
-    return path
 
 
 def logwatcher(log_file) -> Iterator[Optional[LogBucket]]:
