@@ -50,3 +50,10 @@ parser.add_argument(
     help=f"refresh rate of the UI in seconds (defaults to {defaults.UI_REFRESH})",
     default=defaults.UI_REFRESH,
 )
+
+parser.add_argument(
+    "--incident_limit",
+    type=int,
+    help=f"max incident reports in UI (most recent) (defaults to {defaults.INCIDENT_LIMIT})",
+    default=defaults.INCIDENT_LIMIT,
+)

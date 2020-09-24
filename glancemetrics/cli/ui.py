@@ -18,6 +18,7 @@ def render(
     alerts: List[Alert],
     insights_window: timedelta,
     program_runtime: timedelta,
+    incident_limit: int,
 ):
     clear_terminal()
     console.print("GlanceMetrics", style="bold cyan")
@@ -30,10 +31,12 @@ def render(
     console.print(insights_table(insights))
     console.print("\n[bold] Top sections 📈[/bold]")
     console.print(sections_table(top_sections))
-    console.print("\n\n[bold] Alerts [/bold]\n")
+    console.print(
+        f"\n\n[bold] Alerts [/bold] (upto {incident_limit} latest incidents)\n"
+    )
 
     for alert in alerts:
-        print_alert_incidents(alert)
+        print_alert_incidents(alert, limit=incident_limit)
 
 
 def insights_table(i: Insights) -> Table:
@@ -76,14 +79,14 @@ def humanize_time(d: datetime) -> str:
     return d.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
-def print_alert_incidents(alert: Alert) -> Table:
+def print_alert_incidents(alert: Alert, limit: int) -> Table:
     "only high traffic alert supported for now"
     if not alert.incidents:
         console.print("[green] All good, no incidents! [/green]")
         return
 
     # show upto 3 latest incidents in most recent order
-    for incident in list(reversed(alert.incidents))[:3]:
+    for incident in list(reversed(alert.incidents))[:limit]:
         duration = humanize.naturaldelta(incident.duration)
         breach_rate = humanize.intcomma(incident.breach_hitrate)
         max_rate = humanize.intcomma(incident.max_hitrate)
