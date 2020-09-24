@@ -12,5 +12,7 @@ RUN pipenv install --system --dev --deploy --ignore-pipfile
 # hasn't changed
 ADD . /app
 
-EXPOSE 5000
-CMD ["python", "app.py"]
+COPY ./entry.sh /app
+RUN chmod 755 /app/entry.sh
+
+ENTRYPOINT ["/app/entry.sh"]

@@ -1,13 +1,8 @@
 build:
 	docker build -t glancemetrics .
 
-run:
-	docker run -it glancemetrics
-
-build_and_run: build run
-
 test: build
-	docker run -it glancemetrics pytest -s
+	docker run -it --entrypoint pytest glancemetrics -s
 
 format:
 	black .
