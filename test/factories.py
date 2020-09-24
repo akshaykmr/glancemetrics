@@ -32,7 +32,7 @@ def random_method():
 
 
 def random_path():
-    paths = ["/", "/doggo" "/pupper", "/api/hey"]
+    paths = ["/", "/doggo" "/pupper", "/api/hello", "/api/blah", "/doge", "/wow"]
     return choice(paths)
 
 
@@ -66,6 +66,17 @@ def log_record_dm(
     )
 
 
+def random_user_id():
+    ids = [
+        "-",  # none
+        "mojo",
+        "john",
+        "akshay",
+        "datadoggo",
+    ]
+    return choice(ids)
+
+
 def fake_log_str(
     ip=None,
     time=None,
@@ -78,7 +89,8 @@ def fake_log_str(
 ):
     time_tag = datetime.strftime(time or random_time(), "[%d/%b/%Y:%H:%M:%S %z]")
     content_size = randint(500, 1500) if content_size is None else content_size
-    return f"""{ip or random_ip()} {identity or '-'} {user_id or '-'} {time_tag} "{method or random_method()} {path or random_path()} HTTP/1.1" {status_code or random_status()} {content_size}"""
+    user_id = random_user_id() if user_id is None else "-"
+    return f"""{ip or random_ip()} {identity or '-'} {user_id} {time_tag} "{method or random_method()} {path or random_path()} HTTP/1.1" {status_code or random_status()} {content_size}"""
 
 
 class FakeFile:
