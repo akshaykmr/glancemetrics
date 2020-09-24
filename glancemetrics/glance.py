@@ -35,6 +35,9 @@ class GlanceMetrics:
         while True:
             bucket = next(self._log_stream)
             if bucket is None:
+                for alert in self.alerts:
+                    # can't ingore alerts update if no new logs
+                    alert.refresh()
                 return
             for ingestor in self._log_ingestors:
                 ingestor(bucket)
