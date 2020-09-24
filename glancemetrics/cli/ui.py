@@ -26,7 +26,7 @@ def render(
         f"app has been running for {humanize.naturaldelta(program_runtime)}. [yellow]ctrl-c[/yellow] to quit\n"
     )
     console.print(
-        f"[bold]Insights[/bold] for {humanize.naturaldelta(insights_window)}\n"
+        f"[bold]Insights[/bold] for {humanize.precisedelta(insights_window)}\n"
     )
     console.print(insights_table(insights))
     console.print("\n[bold] Top sections 📈[/bold]")
@@ -87,7 +87,7 @@ def print_alert_incidents(alert: Alert, limit: int) -> Table:
 
     # show upto 3 latest incidents in most recent order
     for incident in list(reversed(alert.incidents))[:limit]:
-        duration = humanize.naturaldelta(incident.duration)
+        duration = humanize.precisedelta(incident.duration)
         breach_rate = humanize.intcomma(incident.breach_hitrate)
         max_rate = humanize.intcomma(incident.max_hitrate)
 
