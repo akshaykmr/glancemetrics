@@ -19,7 +19,7 @@ else docker would not be able to see the file.
 
 DOCKER-TIP: if your file lies in /tmp/access.log then
 easiest way is to mount the folder of log fike to /data of container like so:
-docker run -v /tmp:/data glancemetrics -f /data/access.log
+docker run -it -v /tmp:/data glancemetrics -f /data/access.log
 """
         )
         exit(-1)
