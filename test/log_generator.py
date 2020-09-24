@@ -10,12 +10,13 @@ from random import randint
 from glancemetrics.utils.datetime import current_time
 from test.factories import fake_log_str
 
-max_hit_rate = 20
+min_hit_rate = 6000
+max_hit_rate = 9000
 
 try:
     while True:
         now = current_time()
-        for i in range(randint(0, max_hit_rate)):
+        for i in range(randint(min_hit_rate, max_hit_rate)):
             print(fake_log_str(time=now))
         sleep(1)
 except KeyboardInterrupt:

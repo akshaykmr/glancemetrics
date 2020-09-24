@@ -1,5 +1,6 @@
 #!/usr/bin/env/python
 from time import sleep
+import io
 from datetime import timedelta
 
 from glancemetrics.glance import GlanceMetrics
@@ -20,6 +21,10 @@ ui_refresh_rate = args.refresh
 file_path = ensure_file_exists(args.file)
 
 with open(str(file_path), "r") as log_file:
+    # seek to end of file for faster app startup in case of large log files
+    # since we're only interested in current metrics
+    # TODO: could also implement smartly seeking to first log where timestamp > (now - app_window)
+    log_file.seek(0, io.SEEK_END)
     insights_window = timedelta(seconds=args.timewindow)
     alert = Alert(
         threshold=args.alert_threshold, window=timedelta(minutes=args.alertwindow)
