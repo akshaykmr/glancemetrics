@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 clfparser = "*"
 rich = "*"
+humanize = "*"
 
 [dev-packages]
 pytest = "*"
