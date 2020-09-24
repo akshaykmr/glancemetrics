@@ -21,7 +21,7 @@ file_path = ensure_file_exists(args.file)
 
 with open(str(file_path), "r") as log_file:
     insights_window = timedelta(seconds=args.timewindow)
-    alert = Alert(threshold=args.alert_threshold, window=timedelta(minutes=2),)
+    alert = Alert(threshold=args.alert_threshold, window=timedelta(minutes=2))
     glance_app = GlanceMetrics(
         log_stream=logwatcher(log_file),
         insights_window=insights_window,
@@ -39,7 +39,6 @@ with open(str(file_path), "r") as log_file:
                 alerts=glance_app.alerts,
                 insights_window=insights_window,
                 program_runtime=current_time() - program_start_time,
-                section_limit=args.section_limit,
             )
             sleep(ui_refresh_rate)
     except KeyboardInterrupt:

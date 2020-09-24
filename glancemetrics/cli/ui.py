@@ -18,7 +18,6 @@ def render(
     alerts: List[Alert],
     insights_window: timedelta,
     program_runtime: timedelta,
-    section_limit: int,
 ):
     clear_terminal()
     console.print("GlanceMetrics", style="bold cyan")
@@ -26,7 +25,7 @@ def render(
         f"app has been running for {humanize.naturaldelta(program_runtime)}. [yellow]ctrl-c[/yellow] to quit\n"
     )
     console.print(
-        f"[bold]Insights[/bold] - past {humanize.naturaldelta(insights_window)}\n"
+        f"[bold]Insights[/bold] for {humanize.naturaldelta(insights_window)}\n"
     )
     console.print(insights_table(insights))
     console.print("\n[bold] Top sections 📈[/bold]")
