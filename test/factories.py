@@ -119,7 +119,7 @@ class FakeFile:
 
     def readline(self):
         if self.read_lines == len(self.lines):
-            return None
+            return ""
         line = self.lines[self.read_lines]
         self.read_lines += 1
         return line

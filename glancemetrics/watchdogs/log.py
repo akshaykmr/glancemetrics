@@ -19,7 +19,7 @@ def logwatcher(log_file) -> Iterator[Optional[LogBucket]]:
     """
     current_bucket = None
     while True:
-        line = log_file.readline()
+        line = log_file.readline().strip()
         if not line:
             # no new logs
             if current_bucket and _bucket_complete(current_bucket):
