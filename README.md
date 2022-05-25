@@ -1,9 +1,10 @@
 **GlanceMetrics**
 
-HTTP log monitoring console program. Supports [Common log format](https://en.wikipedia.org/wiki/Common_Log_Format) for now.
+HTTP log monitoring console program. Tail live logs for basic insights and setup simple alerts. Supports [Common log format](https://en.wikipedia.org/wiki/Common_Log_Format) for now.
 
 > screenshot
-<img src="./screenshot.png" width="600">
+
+<img src="./screenshot.png" width="750">
 
 ## Run with docker
 
