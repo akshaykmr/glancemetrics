@@ -8,9 +8,13 @@ HTTP log monitoring console program. Tail live logs for basic insights and setup
 
 ## Run with docker
 
+To monitor a log file with path `/data/access.log`:
+
 `docker run akshaykmr/glancemetrics -f /data/access.log`
 
 You'll need to mount the directory of log file, else docker won't be able to see it. For eg. if log file is `/tmp/access.log` then mount `/tmp` dir in docker run command. Here's how  `docker run -it -v /tmp:/data akshaykmr/glancemetrics -f /data/access.log` . Your app should be running! 
+
+
 
 > Note: UI updates every 2 seconds by default, it'll show the insights for past 10 seconds. Everything is configurable for your needs though.
 
@@ -23,7 +27,7 @@ To get full list of configurable options and help pass `-h` flag: `docker run -i
 
 0. `cd` to this directory (dir with readme.md)
 1. Build the image `docker build -t glancemetrics .`
-2. docker run -it -v /tmp:/data glancemetrics -f /data/access.log
+2. `docker run -it -v /tmp:/data glancemetrics -f /data/access.log`
 
 Misc: create fake logs and run the app against them --
 - create fake log stream: `make generate_logs > /tmp/fake_access.log`
