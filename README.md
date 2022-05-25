@@ -1,29 +1,36 @@
-# GlanceMetrics
+**GlanceMetrics**
 
-![image info](./screenshot.png)
+HTTP log monitoring console program. Supports [Common log format](https://en.wikipedia.org/wiki/Common_Log_Format) for now.
 
-Hello/Bonjour!, thank you for taking out the time to carefully evaluate this project. If you have any questions/concerns please let me know.
+> screenshot
+<img src="./screenshot.png" width="600">
 
-## How to run the app on your machine
+## Run with docker
 
-We're going to use **docker** so that you do not have to install
-anything on your system. Follow these steps:
+`docker run akshaykmr/glancemetrics -f /data/access.log`
+
+You'll need to mount the directory of log file, else docker won't be able to see it. For eg. if log file is `/tmp/access.log` then mount `/tmp` dir in docker run command. Here's how  `docker run -it -v /tmp:/data akshaykmr/glancemetrics -f /data/access.log` . Your app should be running! 
+
+> Note: UI updates every 2 seconds by default, it'll show the insights for past 10 seconds. Everything is configurable for your needs though.
+
+To get full list of configurable options and help pass `-h` flag: `docker run -it -v /tmp:/data akshaykmr/glancemetrics -h`.
+  - You can configure file-path, insights-window, alerts-threshold, alert-window, ui-refresh-rate, top-section-limit and more!
+  - eg. with file in `/home/logs.txt`, insights-window of 30s, alert triggering at 20req/s avg for 5mins: `docker run -it -v /home:/data akshaykmr/glancemetrics -f /data/logs.txt --timewindow=30  --alert_threshold=30 --alertwindow=5`
+
+
+## Run from source with docker / Local Development
 
 0. `cd` to this directory (dir with readme.md)
 1. Build the image `docker build -t glancemetrics .`
-2. To run the app, you'll need to mount the directory of log file, else docker won't be able to see it. For eg. if log file is `/tmp/access.log` then mount `/tmp` dir in docker run command. Here's how  `docker run -it -v /tmp:/data glancemetrics -f /data/access.log` . Your app should be running! 
+2. docker run -it -v /tmp:/data glancemetrics -f /data/access.log
 
-> Note: UI updates every 2 seconds by default, it'll show the insights for past 10 seconds. I just didn't feel like waiting 10 seconds. Everything is configurable for your needs though.
-
-To get full list of configurable options and help pass `-h` flag: `docker run -it -v /tmp:/data glancemetrics -h`.
-  - You can configure file-path, insights-window, alerts-threshold, alert-window, ui-refresh-rate, top-section-limit and more!
-  - eg. with file in `/home/akshay/logs.txt`, insights-window of 30s, alert triggering at 20req/s avg for 5mins: `docker run -it -v /home/akshay:/data glancemetrics -f /data/logs.txt --timewindow=30  --alert_threshold=30 --alertwindow=5`
-
+Misc: create fake logs and run the app against them --
+- create fake log stream: `make generate_logs > /tmp/fake_access.log`
+- In another terminal: `docker run -it -v /tmp:/data akshaykmr/glancemetrics -f /data/fake_access.log`
 
 ## Running tests
 
   - `make test`
-
 
 ## Code overview
 Here's the breakdown in brief:
@@ -36,31 +43,28 @@ Here's the breakdown in brief:
 - **tests**: recommend checking out the tests for more insights.
 
 
-## Bonus: Live demo!
-
-What?? Yep, I'm going to use another project on mine to demo this project!
-It's like deploying to production -- satisfying.
-I've set-up 2 streaming terminals -- one of this application, and the other with `tail -f` of the log file it's monitoring.
-
-check it out (no sign-in needed): https://teletype.oorja.io/rooms?id=bc41ea1c-bcca-482a-8c1c-14576460e429#MVcLBWDmMqZSmiWcqYyuYQ==
-
-^^ looks better on large screens, keep scrolled to bottom.
-I'll keep this running for a week, hopefully, my cheap VPS holds up well during this time.
-
-
 ## Other thoughts, improvements
 
-- I'm pretty content with the overall design and performance of the program.
-  - [x] "something you would be proud to put your name on"
 - Speaking of performance, I tested it by generating fake logs with `make generate_logs` - req/s averaging `7000/s`. The UI was still fast enough to refresh every 2 seconds.
 - When starting afresh with large log files (109 MB) though it could take ~11 seconds for the first render (a lot of wasteful processing for logs we're not interested in). To combat this I seek to end of file at the start of the program, since we're only interested in the recent logs. Now it starts instantly. An improvement could be to seek till the first log which falls within the insights-window and then init the log-stream.
 - Improve test-coverage for `glance.py` - enforce-wiring with alerts/insights view eg. `assert alert.ingest.called_with(fake_log_buckted) on glance.refresh()`.
 - Writing the alert triggered/recovered to a file would be useful I think.
 - Lookout for log-rotation and stream the new log file (maybe monitor metadata?)
-- There's no limit to the possible new features though:
-  - plot graphs/sparkline on cli
-  - different alert-types (the app supports multiple alerts, though only one implemented)
-  - http-server with insights-api/websockets updates for a browser-app.
 - Misc: Evaluate introducing a MetricSeries data-structure (series of reduced-metrics of log-buckets). I thought of this when implementing hit-rate alert. This would increase efficiency. Though it was good enough to reuse log-series where I have all the information.
 
-That's it, have a great day!
+
+## License
+
+Copyright Akshay Kumar <akshay.kmr4321@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
