@@ -19,11 +19,27 @@ def test_it_yields_log_buckets_correctly():
     watcher = logwatcher(fake_file)
     buckets = [next(watcher) for i in range(5)]
     assert buckets[0] == LogBucket(
-        time=datetime(2020, 7, 15, 14, 58, 59, tzinfo=timezone.utc,),
+        time=datetime(
+            2020,
+            7,
+            15,
+            14,
+            58,
+            59,
+            tzinfo=timezone.utc,
+        ),
         logs=[
             LogRecord(
                 ip="10.223.157.186",
-                time=datetime(2020, 7, 15, 14, 58, 59, tzinfo=timezone.utc,),
+                time=datetime(
+                    2020,
+                    7,
+                    15,
+                    14,
+                    58,
+                    59,
+                    tzinfo=timezone.utc,
+                ),
                 method="GET",
                 path="/favicon.ico",
                 status_code=404,
@@ -33,7 +49,15 @@ def test_it_yields_log_buckets_correctly():
             ),
             LogRecord(
                 ip="11.22.157.186",
-                time=datetime(2020, 7, 15, 14, 58, 59, tzinfo=timezone.utc,),
+                time=datetime(
+                    2020,
+                    7,
+                    15,
+                    14,
+                    58,
+                    59,
+                    tzinfo=timezone.utc,
+                ),
                 method="GET",
                 path="/api/pup",
                 status_code=200,
@@ -44,11 +68,27 @@ def test_it_yields_log_buckets_correctly():
         ],
     )
     assert buckets[1] == LogBucket(
-        time=datetime(2020, 7, 15, 14, 59, 59, tzinfo=timezone.utc,),
+        time=datetime(
+            2020,
+            7,
+            15,
+            14,
+            59,
+            59,
+            tzinfo=timezone.utc,
+        ),
         logs=[
             LogRecord(
                 ip="10.223.157.186",
-                time=datetime(2020, 7, 15, 14, 59, 59, tzinfo=timezone.utc,),
+                time=datetime(
+                    2020,
+                    7,
+                    15,
+                    14,
+                    59,
+                    59,
+                    tzinfo=timezone.utc,
+                ),
                 method="GET",
                 path="/blah/central",
                 status_code=200,
@@ -60,11 +100,27 @@ def test_it_yields_log_buckets_correctly():
     )
 
     assert buckets[2] == LogBucket(
-        time=datetime(2020, 7, 15, 15, 23, 11, tzinfo=timezone.utc,),
+        time=datetime(
+            2020,
+            7,
+            15,
+            15,
+            23,
+            11,
+            tzinfo=timezone.utc,
+        ),
         logs=[
             LogRecord(
                 ip="10.223.157.186",
-                time=datetime(2020, 7, 15, 15, 23, 11, tzinfo=timezone.utc,),
+                time=datetime(
+                    2020,
+                    7,
+                    15,
+                    15,
+                    23,
+                    11,
+                    tzinfo=timezone.utc,
+                ),
                 method="GET",
                 path="/doge",
                 status_code=200,
@@ -74,7 +130,15 @@ def test_it_yields_log_buckets_correctly():
             ),
             LogRecord(
                 ip="11.22.157.186",
-                time=datetime(2020, 7, 15, 15, 23, 11, tzinfo=timezone.utc,),
+                time=datetime(
+                    2020,
+                    7,
+                    15,
+                    15,
+                    23,
+                    11,
+                    tzinfo=timezone.utc,
+                ),
                 method="GET",
                 path="/power",
                 status_code=200,
@@ -93,11 +157,27 @@ def test_it_yields_log_buckets_correctly():
         '11.22.157.186 - - [15/Jul/2020:15:23:12 +0000] "GET /tailing_swiftly HTTP/1.1" 200 154'
     )
     assert next(watcher) == LogBucket(
-        time=datetime(2020, 7, 15, 15, 23, 12, tzinfo=timezone.utc,),
+        time=datetime(
+            2020,
+            7,
+            15,
+            15,
+            23,
+            12,
+            tzinfo=timezone.utc,
+        ),
         logs=[
             LogRecord(
                 ip="11.22.157.186",
-                time=datetime(2020, 7, 15, 15, 23, 12, tzinfo=timezone.utc,),
+                time=datetime(
+                    2020,
+                    7,
+                    15,
+                    15,
+                    23,
+                    12,
+                    tzinfo=timezone.utc,
+                ),
                 method="GET",
                 path="/tailing_swiftly",
                 status_code=200,

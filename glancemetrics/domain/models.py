@@ -83,7 +83,7 @@ class LogBucket:
 @dataclass
 class LogSeries:
     """histogram like grouping of logs with time, using 1-second intervals
-    eg. 
+    eg.
         if start-time was 1:00:00
         buckets[0] would be the logs captured in 1:00:00 - 1:00:01 interval
         buckets[1] would be the logs captured in 1:00:01 - 1:00:02 interval

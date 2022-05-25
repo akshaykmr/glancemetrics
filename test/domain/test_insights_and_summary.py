@@ -75,7 +75,9 @@ class TestInsightsSummary:
             error_count=0,
             client_errors=0,
             server_errors=0,
-        ), ([] == watcher.insights)
+        ), (
+            [] == watcher.insights
+        )
 
     def test_it_ignores_logs_outside_of_window(self):
         watcher = InsightsSummary(window=timedelta(seconds=5))
@@ -91,4 +93,6 @@ class TestInsightsSummary:
             error_count=0,
             client_errors=0,
             server_errors=0,
-        ), ([] == watcher.insights)
+        ), (
+            [] == watcher.insights
+        )

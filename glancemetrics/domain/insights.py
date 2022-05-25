@@ -20,7 +20,7 @@ def total_hits(series: LogSeries) -> int:
 
 @dataclass
 class Insights:
-    """ metrics report for a time-window """
+    """metrics report for a time-window"""
 
     hits: int
     bytes_transferred: int
@@ -56,7 +56,7 @@ class Insights:
 
 @dataclass
 class SectionLogs:
-    """ logs pertaining to a section """
+    """logs pertaining to a section"""
 
     name: str
     logs: List[LogRecord]

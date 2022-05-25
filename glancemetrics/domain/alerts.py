@@ -73,7 +73,9 @@ class Alert:
 
         # new incident
         incident = Incident(
-            breach_hitrate=hits, max_hitrate=hits, triggered_at=current_time(),
+            breach_hitrate=hits,
+            max_hitrate=hits,
+            triggered_at=current_time(),
         )
         self.incidents.append(incident)
 
